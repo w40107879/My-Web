@@ -1,0 +1,27 @@
+<html>
+
+<body>
+
+<script>
+
+function handleClick(e){
+
+	if ((typeof e == "undefined")||(!e))
+		e = window.event;
+
+	var mouseX = e.clientX;
+	var mouseY = e.clientY;
+
+	document.getElementById("m1").innerHTML = mouseX+","+mouseY;
+}
+
+document.onclick = handleClick;
+
+
+</script>
+
+
+<p id="m1">mouse click event handle</p>
+
+</body>
+</html>

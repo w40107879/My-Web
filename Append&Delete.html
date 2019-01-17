@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<div id="div1">
+<p id="p1">Line 1</p>
+<p id="p2">Line 2</p>
+</div>
+
+<button onclick="myFunction()">Add 1 new line</button>
+<button onclick="myFunction1()">Remove 1 line</button>
+
+
+
+<script>
+var i=3;
+
+function myFunction()
+{
+	var para=document.createElement("p");
+	var node=document.createTextNode("Line "+i);
+	para.appendChild(node);
+
+	var element=document.getElementById("div1");
+	element.appendChild(para);
+	i++;
+};
+
+
+function myFunction1()
+{
+
+	var parent=document.getElementById("div1");
+	var child=document.getElementById("p");
+	parent.removeChild(parent.lastChild);
+
+}
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,29 @@
+<canvas id="canvas" width="150" height="120" ></canvas>
+
+<img id="image" />
+<script>
+  
+  
+  var canvas = document.getElementById("canvas"),
+                context = canvas.getContext("2d");
+
+				context.font = "50px Verdana";
+				context.fillStyle = "#FFA500";
+				context.fillText("YZU", 10, 100);
+				context.lineWidth = 3;
+				context.strokeStyle = "#800000";
+				context.strokeText("YZU", 10, 100);
+				
+
+  var image = document.getElementById('image');
+
+  image.src = canvas.toDataURL('image/png');
+  
+			var deg = 0;
+            function rotate(){
+                deg += 10;
+                document.getElementById("image").style.transform = "rotate(" + deg + "deg)";
+				}
+			window.setInterval("rotate()",50);
+			
+</script>

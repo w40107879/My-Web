@@ -1,2 +1,1 @@
-*.html linguist-language=javascript  
-*.java linguist-language=javascript
+*.html linguist-language=javascript

@@ -1,0 +1,354 @@
+<html>
+<head>
+	<title></title>
+	<meta content="text/html; charset=UTF-8" http-equiv="content-type">
+</head>
+
+<body bgcolor="black">
+
+<script language="JavaScript">
+
+var r = 300;  //半徑
+var x=350,y=350; //絕對位置
+var check = 1;
+var score = 1000;
+var lose = 0;
+var reminder = 0;
+var putValue = new Array(8);
+var EvenOrOddOpen = false;
+var key1 = false;
+var key2 = false;
+var ing1 = false;
+var ing2 = false;
+for(var i=0;i<8;i++)
+	putValue[i] = new Array(8);
+
+var newTable = document.createElement('table');
+newTable.border = 10;
+newTable.bgcolor = "#FFFFFF";
+newTable.style.position="absolute";
+newTable.style.top = 30;
+newTable.style.left = 700;
+//建立賭注表格
+for(var i=0;i<6;i++)
+{
+	tableRow = newTable.insertRow(i);
+	for(var j=0;j<6;j++)
+	{
+		putValue[i][j] = 0;
+		tableCell = tableRow.insertCell(j);
+		tableCell.id = "T"+i+j;	//給予每個Cell的ID T[0][0] = Number 1
+		tableCell.vAlign = "center";
+		tableCell.align = "center";
+		tableCell.width = 180;
+		tableCell.height = 60;
+		tableCell.style.color = "#ffffff";
+		tableCell.style.fontSize = 17;
+		tableCell.onclick = put;
+		number1 = 6 * i + j + 1; //轉換數字 ex:T[1][1] = 8
+		text2 = document.createTextNode("Number: "+number1+" , Puts: "+putValue[i][j]);
+		tableCell.appendChild(text2);
+		
+	}
+}
+
+tableRow = newTable.insertRow(6);
+even = tableRow.insertCell(0);
+putValue[6][0] = 0;
+text2 = document.createTextNode("EVEN $500");
+even.appendChild(text2);
+even.id = "T60";
+even.vAlign = "center";
+even.align = "center";
+even.width = 180;
+even.height = 60;
+even.colSpan = 3;
+even.style.color = "#000000";
+even.style.background = "#808080";
+even.style.fontSize = 17;
+even.onclick = putOddOrEven;
+document.body.appendChild(newTable);
+
+odd = tableRow.insertCell(1);
+odd.innerHTML = "ODD $500";
+odd.id = "T61";
+odd.vAlign = "center";
+odd.align = "center";
+odd.width = 180;
+odd.height = 60;
+odd.colSpan = 3;
+odd.style.color = "#000000";
+odd.style.background = "#808080";
+odd.style.fontSize = 17;
+odd.onclick = putOddOrEven;
+document.body.appendChild(newTable);
+
+//設立Money欄位
+points1 = newTable.insertRow(7);
+points = points1.insertCell(0);
+points.innerHTML = "Your Score : " + score;
+points.id = "pointer";
+points.vAlign = "center";
+points.align = "center";
+points.width = 180;
+points.height = 60;
+points.colSpan = 6;
+points.style.color = "#ffffff";
+points.style.fontSize = 17;
+document.body.appendChild(newTable);
+
+
+//輪盤設定
+function getdiv(id,x,y,w,h,color,text)
+{
+var newElement = document.createElement('div');
+var Text = document.createTextNode(text);
+newElement.id = id;						//給予每個輪盤方位的ID
+newElement.style.position="absolute";
+newElement.style.top  = y;				//設立位置
+newElement.style.left = x;				//設立位置
+newElement.style.width  = w;			//設立輪盤寬度
+newElement.style.height = h;			//設立輪盤高度
+newElement.style.background = color;	//設立輪盤顏色
+newElement.appendChild(Text);			//設立輪盤上的數字
+document.body.appendChild(newElement); 
+}
+
+//輪盤
+for(var i = 10;i <= 360;i += 10)
+	getdiv("c" + i,x + r * Math.sin(i * (Math.PI / 180)) ,y - r * Math.cos(i * (Math.PI / 180)) ,20,20,"#FFFFFF",i / 10);
+//指針
+for(var i = 0;i < 280;i++)
+	getdiv("point" + i,x,y - i,1,1,"#FFFFFF","");
+
+var counter = 1;
+var counter2 = 36;
+function move()
+{
+counter++;
+counter2++;
+if (counter > 36)
+	counter = 1;
+if (counter2 > 36)
+	counter2 = 1;
+var x1;
+var y1;
+
+//設立指針部分
+for (var i = 0;i < 280;i++)
+{
+x1 = x + i * Math.sin(counter * 10 * (Math.PI / 180));
+y1 = y - i * Math.cos(counter * 10 * (Math.PI / 180));
+document.getElementById('point' + i).style.top=y1;
+document.getElementById('point' + i).style.left=x1;
+}
+document.getElementById("c" + counter * 10).style.background = "#FF0000"; //設定指針指到的方位顏色
+if (putValue[Math.floor((counter2 - 1) / 6)][(counter2 - 1) % 6] == 0)		//判斷有放籌碼的數字，轉盤數字變為黃色
+	document.getElementById("c" + counter2 * 10).style.background = "#FFFFFF";
+else
+	document.getElementById("c" + counter2 * 10).style.background = "#FFFF00";
+}
+
+//檢查有無猜中或是有沒有破產
+function tocheck()
+{
+if (check == 1 || lose == 1)
+	return;
+else
+{
+	run1 = window.setInterval("move()",25);
+	check = 1;
+}
+}
+
+//設立放籌碼事件
+function put(event)
+{
+	if(!ing2){key1 = true;}
+	event = window.event;
+var target1 = event.target;
+var targetRow = target1.id.substring(1, 2); //獲取觸發事件的節點ID ex:T24,Row則取2,Col則取4(sunstring(1,2)取前面)
+var targetCol = target1.id.substring(2, 3);	
+var number2;
+if(!key2){
+if (score >= 50)
+{
+	ing1 = true;
+	putValue[targetRow][targetCol]++;
+	score -= 50;
+	number2 = eval(targetRow) * 6 + eval(targetCol) + 1; //把陣列編號轉為Nunmer編號(string * int)
+	target1.innerHTML = "Number: "+number2+" , Puts: "+putValue[targetRow][targetCol];
+	target1.style.background = "#FFA500";
+	target1.style.color = "#000000";
+	document.getElementById("c"+number2+"0").style.background = "#FFFF00"; //再將轉換好的number編號放數對應的轉盤編號
+	document.getElementById("pointer").innerHTML = "Your Score : " + score;
+	reminder += 50;
+}
+else
+	alert("You have no money");
+}
+else
+{
+	alert("你只可以下注一邊");
+
+}
+
+}
+function putOddOrEven(event2)
+{	
+	if(!ing1){key2 = true;}
+	event2 = window.event;
+	var target1 = event2.target;
+	if(!key1){
+	if(score >=500)
+	{
+		ing2 = true;
+		if(target1.id=="T60")
+	{
+		EvenOrOddOpen = true;
+		target1.style.background = "#00BBFF";
+		target1.style.color = "#000000";
+		for (var i = 0;i < 6;i++)
+		{
+			for (var j = 1;j < 6;j+=2)
+				{
+					putValue[i][j]++;
+					number3 = i * 6 + j + 1;
+					document.getElementById("T"+i+j).innerHTML = "Number: "+number3+" , Puts: "+putValue[i][j];
+					document.getElementById("T"+i+j).style.color = "#000000";
+					document.getElementById("T"+i+j).style.background = "#FFA500";
+					document.getElementById("c"+number3+"0").style.background = "#FFFF00";
+				}	
+		}
+		score -=500;
+		document.getElementById("pointer").innerHTML = "Your Score : " + score;
+		reminder +=500;
+
+	}
+
+	else if(target1.id=="T61")
+	{
+		EvenOrOddOpen = true;
+		target1.style.background = "#77FF00";
+		target1.style.color = "#000000";
+		for (var i = 0;i < 6;i++)
+		{
+			for (var j = 0;j < 6;j+=2)
+				{
+					putValue[i][j]++;
+					number3 = i * 6 + j + 1;
+					document.getElementById("T"+i+j).innerHTML = "Number: "+number3+" , Puts: "+putValue[i][j];
+					document.getElementById("T"+i+j).style.color = "#000000";
+					document.getElementById("T"+i+j).style.background = "#FFA500";
+					document.getElementById("c"+number3+"0").style.background = "#FFFF00";
+				}	
+		}
+		score -=500;
+		document.getElementById("pointer").innerHTML = "Your Score : " + score;
+		reminder +=500;
+	}
+	}
+	else
+	{
+		alert("You have no money");
+	}
+}
+else
+alert("你只可以下注一邊!")
+	
+}
+
+
+//判斷以及計算中獎金額
+var number3;
+function count()
+{
+	key1=false;
+	key2=false;
+	ing1=false;
+	ing2=false;
+if (check == 0)
+	return;
+var bingoRow = Math.floor((counter - 1) / 6);
+var bingoCol = (counter - 1) % 6;
+var newElement2 = document.createElement('div');
+if (putValue[bingoRow][bingoCol] != 0)
+{
+	if(EvenOrOddOpen){
+		score += 1000 * putValue[bingoRow][bingoCol];
+	alert ("Bingo! You won "+500 * putValue[bingoRow][bingoCol]+" points.");
+	}
+	else{
+	score += 100 * putValue[bingoRow][bingoCol];
+	alert ("Bingo! You won "+50 * putValue[bingoRow][bingoCol]+" points.");
+	}
+}
+else
+	alert ("Keep going!");
+document.getElementById("pointer").innerHTML = "Your Score : " + score;
+EvenOrOddOpen = false;
+for (var i = 0;i < 6;i++)
+{
+	for (var j = 0;j < 6;j++)
+	{
+		putValue[i][j] = 0;	//籌碼歸零
+		number3 = i * 6 + j + 1;
+		document.getElementById("T"+i+j).innerHTML = "Number: "+number3+" , Puts: "+putValue[i][j];
+		document.getElementById("T"+i+j).style.color = "#FFFFFF";
+		document.getElementById("T"+i+j).style.background = "#000000";
+		document.getElementById("c"+number3+"0").style.background = "#FFFFFF";
+
+	}	
+}
+		document.getElementById("T60").style.background = "#000000";
+		document.getElementById("T60").style.color = "#FFFFFF";
+		document.getElementById("T61").style.background = "#000000";
+		document.getElementById("T61").style.color = "#FFFFFF";
+if (score == 0)
+{
+	alert("You are bankrupted , Press F5 to get money");
+	lose = 1;
+}
+reminder = 0;
+}
+
+function reset()
+{
+		key1=false;
+		key2=false;
+		ing1=false;
+		ing2=false;
+		EvenOrOddOpen = false;
+		document.getElementById("T60").style.background = "#000000";
+		document.getElementById("T60").style.color = "#FFFFFF";
+		document.getElementById("T61").style.background = "#000000";
+		document.getElementById("T61").style.color = "#FFFFFF";
+for (var i = 0;i < 6;i++)
+{
+	for (var j = 0;j < 6;j++)
+	{
+		putValue[i][j] = 0;
+		number3 = i * 6 + j + 1;
+		document.getElementById("T"+i+j).innerHTML = "Number: "+number3+" , Puts: "+putValue[i][j];
+		document.getElementById("T"+i+j).style.color = "#FFFFFF";
+		document.getElementById("T"+i+j).style.background = "#000000";
+		document.getElementById("c"+number3+"0").style.background = "#FFFFFF";
+	}	
+}
+score += reminder;
+document.getElementById("pointer").innerHTML = "Your Score : " + score;
+reminder = 0
+}
+
+
+run1 = window.setInterval("move()",25);
+
+</script>
+
+<input type="button" value="Stop" onClick="clearInterval(run1);count();check = 0;">
+<input type="button" value="Run" onClick="tocheck()">
+<input type="button" value="ResetBet" onClick="reset()">
+
+</body>
+
+</html>

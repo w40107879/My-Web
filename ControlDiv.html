@@ -1,0 +1,69 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=big5"/>
+
+</head>
+<body>
+
+<div id=t1 style="position:absolute;border-width:5;border-style:double;top:100;left:50">Test</div>
+<button onclick="clicklefttoright()">Left and right</button>
+<button onclick="clickcirculmove()">CirCularMove</button>
+<input type="button" value="Stop" onclick="location.reload()"> 
+<h1>Press Stop if you want to change the way to move</h1>
+<script language="javascript">
+var i1=0;
+var v1=5;
+
+function move(){
+
+i1+=v1;
+if(i1>500) v1=-v1;
+if(i1<0) v1=-v1;
+
+document.getElementById('t1').style.left=i1;
+
+}
+
+var oDiv = document.getElementById('t1');
+	var r = 100; // 半?
+	var x = 300; // ?的中心? x 坐?
+	var y = 300; // ?的中心? y 坐?
+	
+	var num = 0; // 起始角度
+
+function circulmove(){
+		num++
+		
+		//Math.sin( num*Math.PI/180 ) = a/r;
+		//Math.cos( num*Math.PI/180 ) = b/r;
+		
+		// 算出?周上每一? A 的 x,y ?
+		var a = Math.sin( num*Math.PI/180 ) * r;
+		var b = Math.cos( num*Math.PI/180 ) * r;
+		
+		// 算出 ?周上每一? A 的坐?
+		oDiv.style.left = x + b + 'px';
+		oDiv.style.top = y + a + 'px';
+		
+		// 生成 div 就可以看到??的痕?
+		var oBox = document.createElement('div');
+		oBox.className = 'box';
+		document.body.appendChild( oBox );
+		
+		oBox.style.left = oDiv.offsetLeft + 'px';
+		oBox.style.top = oDiv.offsetTop + 'px';
+}
+
+function clicklefttoright(){
+	window.setInterval("move()" , 10);
+}
+function clickcirculmove(){
+	window.setInterval("circulmove()" , 5);
+}
+
+
+</script>
+
+</body>  
+  
+</html>
